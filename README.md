@@ -1,8 +1,8 @@
-# OwLore
+# OWS (OwLore)
 
-This repo contains the pre-release version of OwLore algorithm, proposed by [OwLore: Outlier-weighed Layerwise Sampled Low-Rank Projection for Memory-Efficient LLM Fine-tuning](https://arxiv.org/abs/2405.18380).
+This repo contains the pre-release version of OWS algorithm, proposed by [Outlier-weighed Layerwise Sampling for LLM Fine-tuning](https://arxiv.org/abs/2405.18380).
 
-Outlier-weighed Layerwise Sampled Low-Rank Projection (OwLore) is a novel memory-efficient LLM fine-tuning approach, enhances fine-tuning performance by using layerwise sampling and gradient low-rank training.
+Outlier-weighed Layerwise Sampling for LLM Fine-tuning is a novel memory-efficient LLM fine-tuning approach, enhances fine-tuning performance by using layerwise sampling and gradient low-rank training.
 
 <div align="center">
   <img src="https://github.com/pixeli99/OwLore/assets/46072190/fb60054b-7af1-4aa0-9cc8-329c0f96d093" alt="Image 2" style="width: 900px; margin: 0 auto;">
@@ -10,7 +10,9 @@ Outlier-weighed Layerwise Sampled Low-Rank Projection (OwLore) is a novel memory
 
 ## Abstract
 
-The rapid advancements in Large Language Models (LLMs) have revolutionized various natural language processing tasks. However, the substantial size of LLMs presents significant challenges in training or fine-tuning. While parameter-efficient approaches such as low-rank adaptation (LoRA) have gained popularity, they often compromise performance compared to full-rank fine-tuning. In this paper, we propose Outlier-weighed Layerwise Sampled Low-Rank Projection (OwLore), a new memory-efficient fine-tuning approach, inspired by the layerwise outlier distribution of LLMs, which dynamically samples pre-trained layers to fine-tune instead of adding additional adaptors. We first interpret the outlier phenomenon through the lens of Heavy-Tailed Self-Regularization theory (HT-SR), discovering that layers with more outliers tend to be more heavy-tailed and consequently better trained. Inspired by this finding, OwLore strategically assigns higher sampling probabilities to layers with more outliers to better leverage the knowledge stored in pre-trained LLMs. To further mitigate the memory demands of fine-tuning, we integrate gradient low-rank projection into our approach, which facilitates each layer to be efficiently trained in a low-rank manner. By incorporating the efficient characteristics of low-rank and optimal layerwise sampling, OwLore significantly improves the memory-performance trade-off in LLM pruning. Our extensive experiments across various architectures, including LLaMa2, LLaMa3, and Mistral, demonstrate that OwLore consistently outperforms baseline approaches, including full fine-tuning. Specifically, it achieves up to a 1.1% average accuracy gain on the Commonsense Reasoning benchmark, a 3.0% improvement on MMLU, and a notable 10% boost on MT-Bench, while being more memory efficient. OwLore allows us to fine-tune LLaMa2-7B with only 21GB of memory.
+The rapid advancements in Large Language Models (LLMs) have revolutionized various natural-language-processing tasks. However, the substantial size of LLMs presents significant challenges for training or fine-tuning. While parameter-efficient approaches such as low-rank adaptation (LoRA) have gained popularity, they often compromise performance compared with full-rank fine-tuning.
+In this paper, we propose Outlier-weighed Layerwise Sampling (OWS), a new memory-efficient fine-tuning approach inspired by the layer-wise outlier distribution of LLMs. Unlike LoRA—which adds extra adapters to all layers—OWS strategically assigns higher sampling probabilities to layers with more outliers, selectively sampling only a few layers and fine-tuning their pre-trained weights. To further increase the number of fine-tuned layers without a proportional rise in memory cost, we incorporate gradient low-rank projection, boosting performance even more.
+Extensive experiments on architectures including LLaMA 2 and Mistral show that OWS consistently outperforms baseline approaches, even full fine-tuning. Specifically, OWS achieves up to a 1.1 % average accuracy gain on the Commonsense Reasoning benchmark, 3.0 % on MMLU, and a notable 10 % boost on MT-Bench, all while being more memory-efficient. OWS enables fine-tuning 7 B-parameter LLMs with only 21 GB of memory.
 
 ## Quick Start
 
@@ -121,7 +123,7 @@ This repository is build upon the [LMFlow](https://github.com/OptimalScale/LMFlo
 If you find our work helpful for your research, please consider citing the following BibTeX entry.
 ```
 @misc{li2024owlore,
-      title={OwLore: Outlier-weighed Layerwise Sampled Low-Rank Projection for Memory-Efficient LLM Fine-tuning}, 
+      title={Outlier-weighed Layerwise Sampling for LLM Fine-tuning}, 
       author={Pengxiang Li and Lu Yin and Xiaowei Gao and Shiwei Liu},
       year={2024},
       eprint={2405.18380},
