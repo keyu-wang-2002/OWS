@@ -89,6 +89,10 @@ class ModelArguments:
             )
         },
     )
+    model_n_layers: : int = field(
+        default=4,
+        metadata={"help": "The number of layers.",},
+    )
     lora_model_path: Optional[str] = field(
         default=None,
         metadata={
@@ -574,6 +578,9 @@ class FinetunerArguments(TrainingArguments):
     """
     Adapt transformers.TrainingArguments
     """
+    owlore_metric_path: Optional[str] = field(
+        default=None, metadata={"help": "The path of the eval dataset to use."}
+    )
     eval_dataset_path: Optional[str] = field(
         default=None, metadata={"help": "The path of the eval dataset to use."}
     )
