@@ -317,14 +317,17 @@ class Finetuner(BaseTuner):
                         'GPT2LMHeadModel': 'model.transformer.h',
                     }
                     model_class_name = self.model.__class__.__name__
-                    if model_class_name in class_to_layers_map:
-                        self.layers_attribute = class_to_layers_map[model_class_name]
-                    else:
-                        self.layers_attribute = training_args.lisa_layers_attribute
+                    #if model_class_name in class_to_layers_map:
+                    #    self.layers_attribute = class_to_layers_map[model_class_name]
+                    #else:
+                    #    self.layers_attribute = training_args.lisa_layers_attribute
                     # import ipdb
                     # ipdb.set_trace()
-                    self.total_layers = len(eval('self.' + self.layers_attribute))  # Dynamically execute to get the number of layers
+                    #self.total_layers = len(eval('self.' + self.layers_attribute))  # Dynamically execute to get the number of layers
 
+		    self.layers = eval(f'self.model.{self.layers_attribute}')
+		    self.total_layers = len(self.layers)
+			
                     self.active_layers_indices = []
 
                 def freeze_all_layers(self):
