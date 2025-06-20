@@ -324,8 +324,8 @@ class Finetuner(BaseTuner):
                     # import ipdb
                     # ipdb.set_trace()
 		
-                    self.total_layers = len(eval('self.' + self.layers_attribute))  # Dynamically execute to get the number of layers
-
+                    self.total_layers = model_args.model_n_layers #self.total_layers = len(eval('self.' + self.layers_attribute))  # Dynamically execute to get the number of layers
+			
                     self.active_layers_indices = []
 
                 def freeze_all_layers(self):
@@ -361,7 +361,7 @@ class Finetuner(BaseTuner):
                                 for line in f.readlines():
                                     importance_scores.append(float(line.strip()))
                         else:
-                            with open('metric_cache/llama2_ratio_13.txt', 'r') as f:
+                            with open(finetuner_args.owlore_metric_path, 'r') as f:
                                 for line in f.readlines():
                                     importance_scores.append(float(line.strip()))
 
