@@ -300,34 +300,32 @@ class Finetuner(BaseTuner):
 
         if training_args.use_lisa:
             class DynamicLayerActivationCallback(TrainerCallback):
-                def __init__(self, n_layers, interval_steps, model, prob_mode, layers_attribute):
+                def __init__(self, n_layers, interval_steps, model, prob_mode):
                     super().__init__()
                     self.n_layers = n_layers
                     self.interval_steps = interval_steps
                     self.prob_mode = prob_mode
                     self.model = model
-		    self.layers_attribute = layers_attribute
+
                     # Determine the way to access layers based on the model type
-                    #class_to_layers_map = {
-                    #    'LlamaForCausalLM': 'model.model.layers',
-                    #    'Qwen2ForCausalLM': 'model.model.layers',
-                    #    'MistralForCausalLM': 'model.model.layers',
-                    #    'MixtralForCausalLM': 'model.model.layers',
-                    #    'GemmaForCausalLM': 'model.model.layers',
-                    #    'GPT2LMHeadModel': 'model.transformer.h',
-                    #}
+                    class_to_layers_map = {
+                        'LlamaForCausalLM': 'model.model.layers',
+                        'Qwen2ForCausalLM': 'model.model.layers',
+                        'MistralForCausalLM': 'model.model.layers',
+                        'MixtralForCausalLM': 'model.model.layers',
+                        'GemmaForCausalLM': 'model.model.layers',
+                        'GPT2LMHeadModel': 'model.transformer.h',
+                    }
                     model_class_name = self.model.__class__.__name__
-                    #if model_class_name in class_to_layers_map:
-                    #    self.layers_attribute = class_to_layers_map[model_class_name]
-                    #else:
-                    #    self.layers_attribute = training_args.lisa_layers_attribute
+                    if model_class_name in class_to_layers_map:
+                        self.layers_attribute = class_to_layers_map[model_class_name]
+                    else:
+                        self.layers_attribute = training_args.lisa_layers_attribute
                     # import ipdb
                     # ipdb.set_trace()
-                    #self.total_layers = len(eval('self.' + self.layers_attribute))  # Dynamically execute to get the number of layers
+		
+                    self.total_layers = len(eval('self.' + self.layers_attribute))  # Dynamically execute to get the number of layers
 
-		    self.layers = eval(f'self.model.{self.layers_attribute}')
-		    self.total_layers = len(self.layers)
-			
                     self.active_layers_indices = []
 
                 def freeze_all_layers(self):
@@ -343,9 +341,8 @@ class Finetuner(BaseTuner):
 
                 def switch_active_layers(self):
                     # First, disable gradients for all layers
-                    self.layers = eval(f'self.model.{self.layers_attribute}')
-                    self.total_layers = len(self.layers)
                     self.freeze_all_layers()
+
                     # Randomly select n_layers to activate
                     layers = eval('self.' + self.layers_attribute)  # Re-fetch layer references
                     if self.prob_mode == 'decrease':
@@ -398,27 +395,7 @@ class Finetuner(BaseTuner):
 
                         print("Layer selection probabilities:")
                         print(layer_probabilities)
-                    #self.active_layers_indices = np.random.choice(range(self.total_layers), self.n_layers, replace=False, p=layer_probabilities)
-		    
-                    size = min(self.n_layers, self.total_layers)
-                    # 如果传了 layer_probabilities（非 uniform），先校验长度
-                    if layer_probabilities is not None:
-                        assert len(layer_probabilities) == self.total_layers, (
-                            f"len(layer_probabilities)={len(layer_probabilities)} != total_layers={self.total_layers}"
-                        )
-                        self.active_layers_indices = np.random.choice(
-                            a=list(range(self.total_layers)),
-                            size=size,
-                            replace=False,
-                            p=layer_probabilities
-                        )
-                    else:
-                        # uniform sampling
-                        self.active_layers_indices = np.random.choice(
-                            list(range(self.total_layers)),
-                            size=size,
-                            replace=False
-                        )
+                    self.active_layers_indices = np.random.choice(range(self.total_layers), self.n_layers, replace=False, p=layer_probabilities)
                     print(f"Activating layers at indices: {self.active_layers_indices} for the next steps.", flush=True)
 
                     # Enable gradients only for the selected layers
@@ -435,7 +412,6 @@ class Finetuner(BaseTuner):
                 interval_steps=training_args.lisa_interval_steps,               # Step interval to update active layers
                 model=model.get_backend_model(),
                 prob_mode=training_args.lisa_prob_mode,  # Probability mode for layer selection
-		layers_attribute=training_args.lisa_layers_attribute,
             )
 
             trainer_callbacks.append(dynamic_layer_activation_callback)
